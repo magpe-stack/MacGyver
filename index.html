@@ -9,15 +9,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="MacGyver">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>try{var t=JSON.parse(localStorage.getItem("mg_theme"));if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <style>
-:root{--bg:#0b0d0e;--pn:#14181a;--pn2:#1b2124;--ln:#262e32;--tx:#e8eceb;--dim:#7f8b8e;--ac:#ffb300;--ok:#34d27b;--bad:#ff4d44;--r:14px}
+:root{color-scheme:dark;--bg:#0b0d0e;--pn:#14181a;--pn2:#1b2124;--ln:#262e32;--tx:#e8eceb;--dim:#7f8b8e;--ac:#ffb300;--onac:#111;--in:#0f1315;--hd:rgba(11,13,14,.92);--ok:#34d27b;--bad:#ff4d44;--r:14px}
+:root[data-theme=light]{color-scheme:light;--bg:#f2f4f5;--pn:#ffffff;--pn2:#eceff0;--ln:#d3d9dc;--tx:#14191b;--dim:#5c686c;--ac:#b46c00;--onac:#fff;--in:#f7f9f9;--hd:rgba(242,244,245,.92);--ok:#14864a;--bad:#d1352c}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
 body{min-height:100vh;min-height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(11,13,14,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--hd);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
 header h1{font-size:18px;margin:0;letter-spacing:.14em;text-transform:uppercase;flex:1}
 header h1 b{color:var(--ac)}
 #back{display:none;width:44px;height:44px}
@@ -34,10 +36,10 @@ h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)
 button,input,select,textarea{font:inherit;color:var(--tx)}
 button{background:var(--pn2);border:1px solid var(--ln);border-radius:12px;min-height:48px;padding:0 14px;cursor:pointer;touch-action:manipulation}
 button:active{filter:brightness(1.4)}
-button.pri{background:var(--ac);color:#111;border-color:var(--ac);font-weight:700}
+button.pri{background:var(--ac);color:var(--onac);border-color:var(--ac);font-weight:700}
 button.dng{color:var(--bad)}
 button.sm{min-height:36px;padding:0 10px;font-size:13px}
-input,select,textarea{width:100%;background:#0f1315;border:1px solid var(--ln);border-radius:12px;padding:12px;min-height:48px;font-size:16px}
+input,select,textarea{width:100%;background:var(--in);border:1px solid var(--ln);border-radius:12px;padding:12px;min-height:48px;font-size:16px}
 textarea{resize:vertical;min-height:140px}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:-1px}
 input[type=range]{padding:0;accent-color:var(--ac)}
@@ -47,14 +49,14 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
 .big{font-size:48px;font-weight:300;text-align:center;padding:10px 0}
 .dim{color:var(--dim)}.ac{color:var(--ac)}.sp{height:8px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{min-height:38px;padding:0 12px;border-radius:99px;font-size:14px}.chip.on{background:var(--ac);color:#111;border-color:var(--ac);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{min-height:38px;padding:0 12px;border-radius:99px;font-size:14px}.chip.on{background:var(--ac);color:var(--onac);border-color:var(--ac);font-weight:700}
 .list>div{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln)}.list>div:last-child{border:0}
 /* calculadora */
-#cdisp{background:#0f1315;border:1px solid var(--ln);border-radius:12px;padding:12px 14px;text-align:right;margin-bottom:10px;min-height:96px;overflow:hidden}
+#cdisp{background:var(--in);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;text-align:right;margin-bottom:10px;min-height:96px;overflow:hidden}
 #cexp{font-size:22px;color:var(--dim);min-height:30px;word-break:break-all}
 #cres{font-size:42px;font-weight:300;word-break:break-all}
 .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.keys button{min-height:58px;font-size:22px}.keys .op{color:var(--ac)}.keys .eq{grid-column:span 4;background:var(--ac);color:#111;font-weight:700}
+.keys button{min-height:58px;font-size:22px}.keys .op{color:var(--ac)}.keys .eq{grid-column:span 4;background:var(--ac);color:var(--onac);font-weight:700}
 /* notas */
 .note{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px;min-height:60px;background:var(--pn);border-radius:var(--r)}
 .note b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.note small{color:var(--dim)}
@@ -71,7 +73,7 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 .dot{width:16px;height:16px;border-radius:50%;background:var(--ln);display:inline-block;margin:0 5px}.dot.on{background:var(--ac);box-shadow:0 0 12px var(--ac)}.dot.a.on{background:var(--ok);box-shadow:0 0 12px var(--ok)}
 .late{color:var(--bad)}.done{color:var(--ok);text-decoration:line-through;opacity:.7}
 .bar{height:6px;background:var(--ln);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);width:0}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ac);color:#111;padding:12px 18px;border-radius:12px;font-weight:700;z-index:200;display:none;max-width:90%}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ac);color:var(--onac);padding:12px 18px;border-radius:12px;font-weight:700;z-index:200;display:none;max-width:90%}
 .out{font-size:22px;word-break:break-all}
 @media(prefers-reduced-motion:reduce){#alarm{animation:none}}
 </style>
@@ -80,6 +82,7 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 <header>
   <button id="back" aria-label="Voltar">←</button>
   <h1>Mac<b>Gyver</b></h1>
+  <button id="theme" aria-label="Alternar modo claro/escuro" style="width:44px;height:44px;padding:0;font-size:20px"></button>
   <span id="net">online</span>
 </header>
 <main>
@@ -98,13 +101,13 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 <!-- 2 NOTAS -->
 <section class="tool" id="t-notes">
   <div id="nlist">
-    <div class="row"><input id="nq" placeholder="Buscar nas notas…"><button class="pri fix" id="nnew">+ Nova</button></div>
+    <div class="row"><input id="nq" placeholder="Buscar nas notas…"><button class="pri fix" id="nnew" type="button">+ Nova</button></div>
     <div class="sp"></div><div id="nitems"></div>
   </div>
   <div id="ned" style="display:none">
-    <textarea id="ntxt" style="min-height:55vh" placeholder="Escreva aqui… (salva automaticamente)"></textarea>
-    <div class="sp"></div>
-    <div class="row"><button id="nok" class="pri">Concluir</button><button id="ndel" class="dng">Excluir</button></div>
+    <div class="row" style="margin-bottom:8px"><button id="nok" class="pri" type="button">✓ Concluir</button><button id="ncp" class="fix" type="button">Copiar</button><button id="ndel" class="dng fix" type="button">Excluir</button></div>
+    <textarea id="ntxt" style="min-height:45vh" placeholder="Escreva aqui… (salva automaticamente)"></textarea>
+    <div id="nst" class="dim" style="font-size:12px;margin-top:6px;min-height:18px"></div>
   </div>
 </section>
 
@@ -282,17 +285,22 @@ function evalExpr(src){const s=src.replace(/×/g,'*').replace(/÷/g,'/').replace
 
 /* ===== 2 notas ===== */
 (()=>{let notes=store.get('notes',[]),id=null;
-  const save=()=>store.set('notes',notes);
+  if(!Array.isArray(notes))notes=[];
+  const save=()=>store.set('notes',notes),find=()=>notes.find(x=>x.id===id);
   function list(){const q=$('#nq').value.toLowerCase();const a=notes.filter(n=>n.t.toLowerCase().includes(q)).sort((x,y)=>y.ts-x.ts);
-    $('#nitems').innerHTML=a.length?a.map(n=>`<button class="note" data-id="${n.id}"><b>${esc(n.t.split('\n')[0]||'(vazia)')}</b><small>${new Date(n.ts).toLocaleString('pt-BR')}</small></button>`).join(''):'<p class="dim" style="text-align:center">Nenhuma nota.</p>'}
-  function open(i){id=i;const n=notes.find(x=>x.id===i);$('#ntxt').value=n.t;$('#nlist').style.display='none';$('#ned').style.display='block';$('#ntxt').focus()}
-  function close(){const n=notes.find(x=>x.id===id);if(n&&!n.t.trim())notes=notes.filter(x=>x.id!==id);save();id=null;$('#ned').style.display='none';$('#nlist').style.display='block';list()}
-  $('#nnew').onclick=()=>{const n={id:Date.now(),t:'',ts:Date.now()};notes.push(n);save();open(n.id)};
-  $('#nitems').onclick=e=>{const b=e.target.closest('[data-id]');if(b)open(+b.dataset.id)};
-  $('#ntxt').oninput=e=>{const n=notes.find(x=>x.id===id);if(n){n.t=e.target.value;n.ts=Date.now();save()}};
-  $('#nok').onclick=close;
-  $('#ndel').onclick=()=>{if(confirm('Excluir esta nota?')){notes=notes.filter(x=>x.id!==id);save();id=null;$('#ned').style.display='none';$('#nlist').style.display='block';list()}};
-  $('#nq').oninput=list;leaveHooks.notes=()=>{if(id!==null)close()};list()})();
+    $('#nitems').innerHTML=a.length?a.map(n=>`<button type="button" class="note" data-id="${n.id}"><b>${esc(n.t.trim().split('\n')[0]||'(vazia)')}</b><small>${new Date(n.ts).toLocaleString('pt-BR')}</small></button>`).join(''):'<p class="dim" style="text-align:center">Nenhuma nota. Toque em “+ Nova”.</p>'}
+  function view(ed){$('#ned').style.display=ed?'block':'none';$('#nlist').style.display=ed?'none':'block'}
+  function open(i){id=i;$('#ntxt').value=i===null?'':(find()?find().t:'');$('#nst').textContent='';view(true);window.scrollTo(0,0);setTimeout(()=>{try{$('#ntxt').focus()}catch(e){}},50)}
+  function close(){const n=find();if(n&&!n.t.trim()){notes=notes.filter(x=>x!==n);save()}id=null;view(false);list()}
+  $('#nnew').addEventListener('click',()=>open(null));
+  $('#nitems').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)open(Number(b.dataset.id))});
+  $('#ntxt').addEventListener('input',e=>{const v=e.target.value;let n=find();
+    if(!n){if(!v.trim())return;n={id:Date.now(),t:v,ts:Date.now()};notes.push(n);id=n.id}
+    n.t=v;n.ts=Date.now();save();const d=new Date();$('#nst').textContent='Salvo ✓ '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())});
+  $('#nok').addEventListener('click',close);
+  $('#ncp').addEventListener('click',()=>{const v=$('#ntxt').value;if(v)copyTxt(v)});
+  $('#ndel').addEventListener('click',()=>{const n=find();if(!n){close();return}if(confirm('Excluir esta nota?')){notes=notes.filter(x=>x!==n);save();id=null;view(false);list()}});
+  $('#nq').addEventListener('input',list);leaveHooks.notes=()=>{if($('#ned').style.display==='block')close()};list()})();
 
 /* ===== 3 senhas ===== */
 (()=>{const S={u:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',l:'abcdefghijklmnopqrstuvwxyz',d:'0123456789',s:'!@#$%^&*()-_=+[]{};:,.?/'};let cur='';
@@ -454,6 +462,12 @@ const Alarm=(()=>{let iv;const go=()=>{$('#alarm').classList.add('on');const rin
   $('#mbt').onchange=e=>{beats=+e.target.value;idx=0;dots()};
   $('#mtap').onclick=()=>{const n=performance.now();if(taps.length&&n-taps[taps.length-1]>2000)taps=[];taps.push(n);taps=taps.slice(-6);vib(10);if(taps.length>1)setB(60000/((taps[taps.length-1]-taps[0])/(taps.length-1)))};
   leaveHooks.met=stop;setB(bpm);dots()})();
+
+/* ===== tema claro/escuro ===== */
+(()=>{const mq=matchMedia('(prefers-color-scheme: light)');let t=store.get('theme',null)||(mq.matches?'light':'dark');
+  function apply(x){t=x;document.documentElement.dataset.theme=x;$('#theme').textContent=x==='light'?'🌙':'☀️';const m=$('meta[name=theme-color]');if(m)m.content=x==='light'?'#f2f4f5':'#0b0d0e'}
+  apply(t);$('#theme').onclick=()=>{const n=t==='light'?'dark':'light';store.set('theme',n);apply(n)};
+  if(mq.addEventListener)mq.addEventListener('change',e=>{if(!store.get('theme',null))apply(e.matches?'light':'dark')})})();
 
 /* ===== PWA ===== */
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
