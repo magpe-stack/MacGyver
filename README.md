@@ -6,6 +6,11 @@ O MacGyver é um canivete suíço digital: 14 ferramentas de uso diário num ún
 
 Três princípios guiam o app. Ele é **offline**: depois da primeira abertura, todos os arquivos ficam guardados no aparelho. Ele é **local**: tudo o que você salva fica no seu navegador e nada é enviado a servidores. Ele é **simples**: sem cadastro, sem anúncios, sem rastreio e sem bibliotecas externas. Pode ser instalado na tela inicial como um aplicativo comum (PWA).
 
+
+![MacGyver App Preview](MacGyver-App1.png)
+
+
+
 | # | Ferramenta | Para que serve | Guarda dados no aparelho |
 | --- | --- | --- | --- |
 | 1 | Calculadora | Contas com parênteses e porcentagem | Não |
