@@ -1,4 +1,4 @@
-const CACHE = 'macgyver-v1';
+const CACHE = 'macgyver-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
