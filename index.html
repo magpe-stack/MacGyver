@@ -214,6 +214,18 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
     <label>Tempos por compasso</label><select id="mbt"></select></div>
   <div class="row"><button class="pri" id="mgo" style="min-height:60px">▶ Iniciar</button><button id="mtap" style="min-height:60px">Tap tempo</button></div>
 </section>
+<!-- 14 DATAS -->
+<section class="tool" id="t-date">
+  <div class="box"><h2>Diferença entre datas</h2>
+    <div class="row"><div><label>De</label><input type="date" id="da"></div><div><label>Até</label><input type="date" id="db"></div></div>
+    <div class="big ac" id="dd1" style="font-size:26px;padding:12px 0 2px">–</div><div class="dim mono" id="dd2" style="text-align:center;font-size:14px"></div></div>
+  <div class="box"><h2>Somar ou subtrair dias</h2>
+    <div class="row"><div><label>Data inicial</label><input type="date" id="dc"></div><div><label>Dias (use − para voltar)</label><input type="number" id="dn" inputmode="numeric" value="30"></div></div>
+    <div class="big ac" id="dd3" style="font-size:22px;padding:12px 0 0">–</div></div>
+  <div class="box"><h2>Idade e aniversário</h2>
+    <label>Data de nascimento</label><input type="date" id="de">
+    <div class="big ac" id="dd4" style="font-size:26px;padding:12px 0 2px">–</div><div class="dim" id="dd5" style="text-align:center;font-size:14px"></div></div>
+</section>
 </main>
 
 <div class="ov" id="fl"><div id="flh">Toque para desligar</div></div>
@@ -243,16 +255,16 @@ const num=s=>parseFloat(String(s).replace(/\./g,function(m,o,str){return str.ind
 const TOOLS=[
 ['calc','🧮','Calculadora','Expressões e %'],['notes','📝','Notas','Salvas no aparelho'],['pass','🔐','Senhas','Geração segura'],['conv','📐','Conversor','Medidas e temperatura'],
 ['sw','⏱️','Cronômetro','Com parciais'],['tm','⏳','Timer','Alarme sonoro'],['cnt','🔢','Contador','Vários, com vibração'],['fl','🔦','Lanterna','Tela cheia'],
-['sos','🆘','SOS','Morse luz + som'],['med','💊','Remédios','Horários e doses'],['dice','🎲','Sorteio','Dados, moeda, lista'],['bill','🧾','Divisor','Conta e gorjeta'],['met','🎵','Metrônomo','30–240 BPM']];
+['sos','🆘','SOS','Morse luz + som'],['med','💊','Remédios','Horários e doses'],['dice','🎲','Sorteio','Dados, moeda, lista'],['bill','🧾','Divisor','Conta e gorjeta'],['met','🎵','Metrônomo','30–240 BPM'],['date','📅','Datas','Diferença, soma, idade']];
 const NAMES={};TOOLS.forEach(t=>NAMES[t[0]]=t[2]);
 $('#grid').innerHTML=TOOLS.map(t=>`<button class="card-t" data-go="${t[0]}"><span class="ic">${t[1]}</span><span class="nm">${t[2]}</span><span class="ds">${t[3]}</span></button>`).join('');
 $('#grid').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)location.hash=b.dataset.go});
 $('#back').onclick=()=>{location.hash=''};
-const leaveHooks={};
+const leaveHooks={},enterHooks={};
 let cur='';
 function route(){const id=location.hash.slice(1);const ok=NAMES[id]?id:'';
   if(cur&&cur!==ok&&leaveHooks[cur])leaveHooks[cur]();
-  cur=ok;$('#home').style.display=ok?'none':'block';
+  cur=ok;if(ok&&enterHooks[ok])enterHooks[ok]();$('#home').style.display=ok?'none':'block';
   $$('.tool').forEach(s=>s.classList.toggle('on',s.id==='t-'+ok));
   $('#back').style.display=ok?'block':'none';
   $('header h1').innerHTML=ok?esc(NAMES[ok]):'Mac<b>Gyver</b>';window.scrollTo(0,0)}
@@ -284,11 +296,12 @@ function evalExpr(src){const s=src.replace(/×/g,'*').replace(/÷/g,'/').replace
     upd()});upd()})();
 
 /* ===== 2 notas ===== */
-(()=>{let notes=store.get('notes',[]),id=null;
-  if(!Array.isArray(notes))notes=[];
+(()=>{let notes=[],id=null;
+  const load=()=>{const n=store.get('notes',[]);notes=Array.isArray(n)?n:[]};
   const save=()=>store.set('notes',notes),find=()=>notes.find(x=>x.id===id);
+  const editing=()=>$('#ned').style.display==='block';
   function list(){const q=$('#nq').value.toLowerCase();const a=notes.filter(n=>n.t.toLowerCase().includes(q)).sort((x,y)=>y.ts-x.ts);
-    $('#nitems').innerHTML=a.length?a.map(n=>`<button type="button" class="note" data-id="${n.id}"><b>${esc(n.t.trim().split('\n')[0]||'(vazia)')}</b><small>${new Date(n.ts).toLocaleString('pt-BR')}</small></button>`).join(''):'<p class="dim" style="text-align:center">Nenhuma nota. Toque em “+ Nova”.</p>'}
+    $('#nitems').innerHTML=a.length?a.map(n=>`<button type="button" class="note" data-id="${n.id}"><b>${esc(n.t.trim().split('\n')[0]||'(vazia)')}</b><small>${new Date(n.ts).toLocaleString('pt-BR')}</small></button>`).join(''):`<p class="dim" style="text-align:center">${notes.length?'Nada encontrado.':'Nenhuma nota. Toque em “+ Nova”.'}</p>`}
   function view(ed){$('#ned').style.display=ed?'block':'none';$('#nlist').style.display=ed?'none':'block'}
   function open(i){id=i;$('#ntxt').value=i===null?'':(find()?find().t:'');$('#nst').textContent='';view(true);window.scrollTo(0,0);setTimeout(()=>{try{$('#ntxt').focus()}catch(e){}},50)}
   function close(){const n=find();if(n&&!n.t.trim()){notes=notes.filter(x=>x!==n);save()}id=null;view(false);list()}
@@ -296,11 +309,15 @@ function evalExpr(src){const s=src.replace(/×/g,'*').replace(/÷/g,'/').replace
   $('#nitems').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)open(Number(b.dataset.id))});
   $('#ntxt').addEventListener('input',e=>{const v=e.target.value;let n=find();
     if(!n){if(!v.trim())return;n={id:Date.now(),t:v,ts:Date.now()};notes.push(n);id=n.id}
-    n.t=v;n.ts=Date.now();save();const d=new Date();$('#nst').textContent='Salvo ✓ '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())});
+    n.t=v;n.ts=Date.now();save();list();const d=new Date();$('#nst').textContent='Salvo ✓ '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())});
   $('#nok').addEventListener('click',close);
   $('#ncp').addEventListener('click',()=>{const v=$('#ntxt').value;if(v)copyTxt(v)});
   $('#ndel').addEventListener('click',()=>{const n=find();if(!n){close();return}if(confirm('Excluir esta nota?')){notes=notes.filter(x=>x!==n);save();id=null;view(false);list()}});
-  $('#nq').addEventListener('input',list);leaveHooks.notes=()=>{if($('#ned').style.display==='block')close()};list()})();
+  $('#nq').addEventListener('input',list);
+  leaveHooks.notes=()=>{if(editing())close()};
+  enterHooks.notes=()=>{load();id=null;$('#nq').value='';view(false);list()};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cur==='notes'&&!editing()){load();list()}});
+  load();list()})();
 
 /* ===== 3 senhas ===== */
 (()=>{const S={u:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',l:'abcdefghijklmnopqrstuvwxyz',d:'0123456789',s:'!@#$%^&*()-_=+[]{};:,.?/'};let cur='';
@@ -462,6 +479,25 @@ const Alarm=(()=>{let iv;const go=()=>{$('#alarm').classList.add('on');const rin
   $('#mbt').onchange=e=>{beats=+e.target.value;idx=0;dots()};
   $('#mtap').onclick=()=>{const n=performance.now();if(taps.length&&n-taps[taps.length-1]>2000)taps=[];taps.push(n);taps=taps.slice(-6);vib(10);if(taps.length>1)setB(60000/((taps[taps.length-1]-taps[0])/(taps.length-1)))};
   leaveHooks.met=stop;setB(bpm);dots()})();
+
+/* ===== 14 datas ===== */
+(()=>{const dd=new Date(),TD=dd.getFullYear()+'-'+pad(dd.getMonth()+1)+'-'+pad(dd.getDate());
+  const P=s=>{if(!s)return null;const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)};
+  const F=ms=>new Date(ms).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric',timeZone:'UTC'});
+  const pl=(n,s,p)=>n+' '+(n===1?s:p);
+  function ymd(a,b){const A=new Date(a),B=new Date(b);let y=B.getUTCFullYear()-A.getUTCFullYear(),m=B.getUTCMonth()-A.getUTCMonth(),d=B.getUTCDate()-A.getUTCDate();
+    if(d<0){m--;d+=new Date(Date.UTC(B.getUTCFullYear(),B.getUTCMonth(),0)).getUTCDate()}if(m<0){y--;m+=12}return [y,m,d]}
+  const txt=([y,m,d])=>[y&&pl(y,'ano','anos'),m&&pl(m,'mês','meses'),d&&pl(d,'dia','dias')].filter(Boolean).join(', ')||'0 dias';
+  ['#da','#db','#dc'].forEach(s=>$(s).value=TD);
+  function c1(){let a=P($('#da').value),b=P($('#db').value);if(a==null||b==null){$('#dd1').textContent='–';$('#dd2').textContent='';return}
+    if(a>b)[a,b]=[b,a];const t=Math.round((b-a)/864e5);$('#dd1').textContent=txt(ymd(a,b));
+    $('#dd2').textContent=`${t.toLocaleString('pt-BR')} dias no total · ${fmtN(t/7,2)} semanas`}
+  function c2(){const a=P($('#dc').value),n=Math.trunc(+$('#dn').value||0);if(a==null){$('#dd3').textContent='–';return}$('#dd3').textContent=F(a+n*864e5)}
+  function c3(){const b=P($('#de').value),t=P(TD);if(b==null){$('#dd4').textContent='–';$('#dd5').textContent='';return}
+    if(b>t){$('#dd4').textContent='Data no futuro';$('#dd5').textContent='';return}
+    $('#dd4').textContent=txt(ymd(b,t));const bd=new Date(b);let y=new Date(t).getUTCFullYear(),n=Date.UTC(y,bd.getUTCMonth(),bd.getUTCDate());if(n<t)n=Date.UTC(y+1,bd.getUTCMonth(),bd.getUTCDate());
+    const k=Math.round((n-t)/864e5);$('#dd5').textContent=k===0?'Hoje é o seu aniversário! 🎉':`Faltam ${pl(k,'dia','dias')} para o próximo aniversário · já viveu ${Math.round((t-b)/864e5).toLocaleString('pt-BR')} dias`}
+  $('#da').oninput=$('#db').oninput=c1;$('#dc').oninput=$('#dn').oninput=c2;$('#de').oninput=c3;c1();c2()})();
 
 /* ===== tema claro/escuro ===== */
 (()=>{const mq=matchMedia('(prefers-color-scheme: light)');let t=store.get('theme',null)||(mq.matches?'light':'dark');
