@@ -60,6 +60,10 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 /* notas */
 .note{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px;min-height:60px;background:var(--pn);border-radius:var(--r)}
 .note b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.note small{color:var(--dim)}
+.nc{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:12px;margin-bottom:8px;cursor:pointer}
+.nc.edit{border-color:var(--ac)}.nc.fresh{animation:pop 1.2s ease-out}@keyframes pop{from{background:var(--ac)}}
+.nc .tx{white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nc .mt{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--dim)}.nc .mt span{flex:1}
 /* parciais */
 .lap{display:grid;grid-template-columns:40px 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln);font-size:15px}.lap.best{color:var(--ok)}.lap.worst{color:var(--bad)}
 /* contador */
@@ -100,15 +104,15 @@ label{display:block;font-size:13px;color:var(--dim);margin:8px 0 4px}
 
 <!-- 2 NOTAS -->
 <section class="tool" id="t-notes">
-  <div id="nlist">
-    <div class="row"><input id="nq" placeholder="Buscar nas notas…"><button class="pri fix" id="nnew" type="button">+ Nova</button></div>
-    <div class="sp"></div><div id="nitems"></div>
+  <div class="box" id="nbox">
+    <h2 id="nht">Nova nota</h2>
+    <textarea id="ntxt" style="min-height:120px" placeholder="Escreva sua nota aqui…"></textarea>
+    <div class="sp"></div>
+    <div class="row"><button class="pri" id="nsave" type="button">Salvar nota</button><button id="ncancel" type="button" class="fix" style="display:none">Cancelar</button></div>
   </div>
-  <div id="ned" style="display:none">
-    <div class="row" style="margin-bottom:8px"><button id="nok" class="pri" type="button">✓ Concluir</button><button id="ncp" class="fix" type="button">Copiar</button><button id="ndel" class="dng fix" type="button">Excluir</button></div>
-    <textarea id="ntxt" style="min-height:45vh" placeholder="Escreva aqui… (salva automaticamente)"></textarea>
-    <div id="nst" class="dim" style="font-size:12px;margin-top:6px;min-height:18px"></div>
-  </div>
+  <div class="row" style="margin:16px 0 8px"><h2 style="margin:0;flex:1" id="ncount">Minhas notas</h2></div>
+  <input id="nq" placeholder="Buscar nas notas…" style="margin-bottom:10px">
+  <div id="nitems"></div>
 </section>
 
 <!-- 3 SENHAS -->
@@ -296,28 +300,29 @@ function evalExpr(src){const s=src.replace(/×/g,'*').replace(/÷/g,'/').replace
     upd()});upd()})();
 
 /* ===== 2 notas ===== */
-(()=>{let notes=[],id=null;
+(()=>{let notes=[],eid=null;
   const load=()=>{const n=store.get('notes',[]);notes=Array.isArray(n)?n:[]};
-  const save=()=>store.set('notes',notes),find=()=>notes.find(x=>x.id===id);
-  const editing=()=>$('#ned').style.display==='block';
-  function list(){const q=$('#nq').value.toLowerCase();const a=notes.filter(n=>n.t.toLowerCase().includes(q)).sort((x,y)=>y.ts-x.ts);
-    $('#nitems').innerHTML=a.length?a.map(n=>`<button type="button" class="note" data-id="${n.id}"><b>${esc(n.t.trim().split('\n')[0]||'(vazia)')}</b><small>${new Date(n.ts).toLocaleString('pt-BR')}</small></button>`).join(''):`<p class="dim" style="text-align:center">${notes.length?'Nada encontrado.':'Nenhuma nota. Toque em “+ Nova”.'}</p>`}
-  function view(ed){$('#ned').style.display=ed?'block':'none';$('#nlist').style.display=ed?'none':'block'}
-  function open(i){id=i;$('#ntxt').value=i===null?'':(find()?find().t:'');$('#nst').textContent='';view(true);window.scrollTo(0,0);setTimeout(()=>{try{$('#ntxt').focus()}catch(e){}},50)}
-  function close(){const n=find();if(n&&!n.t.trim()){notes=notes.filter(x=>x!==n);save()}id=null;view(false);list()}
-  $('#nnew').addEventListener('click',()=>open(null));
-  $('#nitems').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)open(Number(b.dataset.id))});
-  $('#ntxt').addEventListener('input',e=>{const v=e.target.value;let n=find();
-    if(!n){if(!v.trim())return;n={id:Date.now(),t:v,ts:Date.now()};notes.push(n);id=n.id}
-    n.t=v;n.ts=Date.now();save();list();const d=new Date();$('#nst').textContent='Salvo ✓ '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())});
-  $('#nok').addEventListener('click',close);
-  $('#ncp').addEventListener('click',()=>{const v=$('#ntxt').value;if(v)copyTxt(v)});
-  $('#ndel').addEventListener('click',()=>{const n=find();if(!n){close();return}if(confirm('Excluir esta nota?')){notes=notes.filter(x=>x!==n);save();id=null;view(false);list()}});
-  $('#nq').addEventListener('input',list);
-  leaveHooks.notes=()=>{if(editing())close()};
-  enterHooks.notes=()=>{load();id=null;$('#nq').value='';view(false);list()};
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cur==='notes'&&!editing()){load();list()}});
-  load();list()})();
+  function save(){store.set('notes',notes);try{const b=JSON.parse(localStorage.getItem('mg_notes')||'[]');if(b.length!==notes.length)throw 0}catch(e){toast('⚠ Armazenamento indisponível: as notas não ficarão salvas ao fechar o app')}}
+  function render(fresh){const q=$('#nq').value.toLowerCase().trim();
+    const a=notes.filter(n=>n.t.toLowerCase().includes(q)).sort((x,y)=>y.ts-x.ts||y.id-x.id);
+    $('#ncount').textContent='Minhas notas ('+notes.length+')';
+    $('#nitems').innerHTML=a.length?a.map(n=>`<div class="nc${n.id===eid?' edit':''}${n.id===fresh?' fresh':''}" data-id="${n.id}"><div class="tx">${esc(n.t)}</div><div class="mt"><span>${new Date(n.ts).toLocaleString('pt-BR')}</span><button type="button" class="sm" data-a="copy">Copiar</button><button type="button" class="sm dng" data-a="del">Excluir</button></div></div>`).join(''):`<p class="dim" style="text-align:center;margin-top:20px">${notes.length?'Nada encontrado.':'Nenhuma nota ainda. Escreva acima e toque em “Salvar nota”.'}</p>`}
+  function setMode(){$('#nht').textContent=eid?'Editando nota':'Nova nota';$('#nsave').textContent=eid?'Salvar alterações':'Salvar nota';$('#ncancel').style.display=eid?'block':'none'}
+  function reset(){eid=null;$('#ntxt').value='';store.set('ndraft','');setMode()}
+  $('#nsave').addEventListener('click',()=>{const v=$('#ntxt').value.trim();if(!v){toast('Escreva algo antes de salvar');return}
+    let n=eid&&notes.find(x=>x.id===eid);if(n){n.t=v;n.ts=Date.now()}else{n={id:Math.max(Date.now(),...notes.map(x=>x.id+1)),t:v,ts:Date.now()};notes.push(n)}
+    save();$('#nq').value='';reset();render(n.id);vib(15);toast('Nota salva ✓')});
+  $('#ncancel').addEventListener('click',()=>{reset();render()});
+  $('#ntxt').addEventListener('input',e=>{if(!eid)store.set('ndraft',e.target.value)});
+  $('#nq').addEventListener('input',()=>render());
+  $('#nitems').addEventListener('click',e=>{const c=e.target.closest('.nc');if(!c)return;const id=Number(c.dataset.id),n=notes.find(x=>x.id===id);if(!n)return;
+    const act=e.target.closest('[data-a]');
+    if(act&&act.dataset.a==='copy'){copyTxt(n.t);return}
+    if(act&&act.dataset.a==='del'){if(confirm('Excluir esta nota?')){notes=notes.filter(x=>x.id!==id);save();if(eid===id)reset();render()}return}
+    eid=id;$('#ntxt').value=n.t;setMode();render();window.scrollTo(0,0);$('#ntxt').focus()});
+  enterHooks.notes=()=>{load();render()};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cur==='notes'){load();render()}});
+  load();$('#ntxt').value=store.get('ndraft','')||'';setMode();render()})();
 
 /* ===== 3 senhas ===== */
 (()=>{const S={u:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',l:'abcdefghijklmnopqrstuvwxyz',d:'0123456789',s:'!@#$%^&*()-_=+[]{};:,.?/'};let cur='';
