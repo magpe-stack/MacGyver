@@ -1,7 +1,5 @@
 # Manual do MacGyver
 
-Nov 1, 2026 · @Marinaldo
-
 ## Visão geral
 
 O MacGyver é um canivete suíço digital: 14 ferramentas de uso diário num único aplicativo que roda no navegador do celular e funciona sem internet.
